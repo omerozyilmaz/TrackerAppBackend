@@ -3,25 +3,25 @@
 TrackerAppBackend Codes
 yep
 
-## CORS Hatası ve Çözümü
+## CORS Error and Solution
 
-### Karşılaşılan Hata
+### Encountered Error
 
-API'ye frontend tarafından yapılan isteklerde CORS (Cross-Origin Resource Sharing) hatası alındı. Terminalde aşağıdaki hata mesajları görüldü:
+A CORS (Cross-Origin Resource Sharing) error was encountered when making requests to the API from the frontend. The following error messages were observed in the terminal:
 
-### Çözümün Açıklaması
+### Explanation of the Solution
 
-- `Access-Control-Allow-Origin: "*"` - Tüm origin'lerden gelen isteklere izin verir. Üretim ortamında güvenlik için belirli domain'lere kısıtlanmalıdır.
-- `Access-Control-Allow-Credentials: "true"` - Kimlik doğrulama bilgilerini içeren isteklere izin verir.
-- `Access-Control-Allow-Headers` - İzin verilen HTTP başlıklarını belirtir.
-- `Access-Control-Allow-Methods` - İzin verilen HTTP metodlarını belirtir.
-- OPTIONS istekleri için özel işleme - Preflight isteklerini 204 (No Content) durum koduyla yanıtlar, bu da tarayıcıya asıl isteği göndermenin güvenli olduğunu bildirir.
+- `Access-Control-Allow-Origin: "*"` - Allows requests from all origins. In a production environment, it should be restricted to specific domains for security.
+- `Access-Control-Allow-Credentials: "true"` - Allows requests that include authentication credentials.
+- `Access-Control-Allow-Headers` - Specifies the allowed HTTP headers.
+- `Access-Control-Allow-Methods` - Specifies the allowed HTTP methods.
+- Special handling for OPTIONS requests - Responds to preflight requests with a 204 (No Content) status code, indicating to the browser that it is safe to proceed with the actual request.
 
-Bu değişiklikler, frontend uygulamasının API'ye sorunsuz bir şekilde erişmesini sağlar.
+These changes ensure that the frontend application can access the API smoothly.
 
-### Güvenlik Notu
+### Security Note
 
-Üretim ortamında, `Access-Control-Allow-Origin` değerini `*` yerine frontend uygulamanızın gerçek domain'i ile değiştirmek daha güvenlidir:
+In a production environment, it is more secure to replace the `Access-Control-Allow-Origin` value with the actual domain of your frontend application instead of `*`:
 
 ```go
 r.Use(cors.New(cors.Config{
@@ -33,4 +33,4 @@ r.Use(cors.New(cors.Config{
 }))
 ```
 
-Bu yapılandırma, frontend uygulamanızın API'ye erişmesine izin verecektir.
+This configuration will allow your frontend application to access the API.
