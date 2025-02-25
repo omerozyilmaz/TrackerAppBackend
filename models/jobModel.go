@@ -7,12 +7,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// Status değerleri için sabitler tanımlayalım
+const (
+	StatusWishlist  = "wishlist"
+	StatusApplied   = "applied"
+	StatusInterview = "interview"
+)
+
 type Job struct {
 	ID          uint           `json:"id" gorm:"primaryKey"`
 	UserID      uint           `json:"user_id" gorm:"not null"`
 	Title       string         `json:"title" gorm:"not null" binding:"required"`
 	Company     string         `json:"company" gorm:"not null" binding:"required"`
-	Status      string         `json:"status" gorm:"not null"`
+	Status      string         `json:"status" gorm:"not null" gorm:"default:wishlist"`
 	Description string         `json:"description"`
 	Location    string         `json:"location"`
 	JobURL      string         `json:"jobUrl"`
@@ -58,4 +65,9 @@ func (j *Job) Update(db *gorm.DB, userID uint) error {
 func DeleteJob(db *gorm.DB, userID uint, jobID uint) error {
 	tableName := GetJobTableName(userID)
 	return db.Table(tableName).Delete(&Job{}, jobID).Error
+}
+
+// Status değerinin geçerli olup olmadığını kontrol eden yardımcı fonksiyon
+func IsValidStatus(status string) bool {
+	return status == StatusWishlist || status == StatusApplied || status == StatusInterview
 } 

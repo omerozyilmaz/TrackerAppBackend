@@ -2,6 +2,7 @@ package main
 
 import (
 	"job-tracker-api/config"
+	"job-tracker-api/middleware"
 	"job-tracker-api/routes"
 	"log"
 
@@ -20,6 +21,9 @@ func main() {
 
 	// Initialize router
 	r := gin.Default()
+
+	// Use CORS middleware
+	r.Use(middleware.CORSMiddleware())
 
 	// Setup routes
 	routes.SetupJobRoutes(r)
