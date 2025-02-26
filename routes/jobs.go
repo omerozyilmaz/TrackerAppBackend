@@ -13,8 +13,10 @@ func SetupJobRoutes(router *gin.Engine) {
 	jobs.Use(middleware.CORSMiddleware())
 	jobs.Use(middleware.AuthMiddleware())
 	{
-		jobs.GET("/", controllers.GetJobs)
-		jobs.POST("/", controllers.CreateJob)
+		jobs.GET("", controllers.GetJobs)      // Handle /jobs
+		jobs.GET("/", controllers.GetJobs)     // Handle /jobs/
+		jobs.POST("", controllers.CreateJob)   // Handle /jobs
+		jobs.POST("/", controllers.CreateJob)  // Handle /jobs/
 		jobs.GET("/:id", controllers.GetJob)
 		jobs.PUT("/:id", controllers.UpdateJob)
 		jobs.DELETE("/:id", controllers.DeleteJob)
@@ -30,8 +32,10 @@ func SetupJobRoutes(router *gin.Engine) {
 	apiJobs.Use(middleware.CORSMiddleware())
 	apiJobs.Use(middleware.AuthMiddleware())
 	{
-		apiJobs.GET("/", controllers.GetJobs)
-		apiJobs.POST("/", controllers.CreateJob)
+		apiJobs.GET("", controllers.GetJobs)      // Handle /api/jobs
+		apiJobs.GET("/", controllers.GetJobs)     // Handle /api/jobs/
+		apiJobs.POST("", controllers.CreateJob)   // Handle /api/jobs
+		apiJobs.POST("/", controllers.CreateJob)  // Handle /api/jobs/
 		apiJobs.GET("/:id", controllers.GetJob)
 		apiJobs.PUT("/:id", controllers.UpdateJob)
 		apiJobs.DELETE("/:id", controllers.DeleteJob)

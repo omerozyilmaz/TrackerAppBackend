@@ -15,6 +15,10 @@ func main() {
 
 	// Initialize router
 	r := gin.Default()
+	
+	// Disable automatic redirects
+	r.RedirectTrailingSlash = false
+	r.RedirectFixedPath = false
 
 	// Use CORS middleware
 	r.Use(middleware.CORSMiddleware())
