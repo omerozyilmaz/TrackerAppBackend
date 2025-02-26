@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"job-tracker-api/models"
+	"log"
 	"os"
 
 	"gorm.io/driver/postgres"
@@ -10,20 +12,26 @@ import (
 
 var DB *gorm.DB
 
-func ConnectDB() (*gorm.DB, error) {
-	dsn := os.Getenv("DATABASE_URL")
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func ConnectDB() {
+	var err error
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_PORT"),
+	)
+
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		log.Fatal("Failed to connect to database")
 	}
 
-	// AutoMigrate işlemi burada yapılabilir
-	// err = db.AutoMigrate(&models.User{}, &models.Job{})
-	// if err != nil {
-	//     return nil, err
-	// }
-
-	return db, nil
+	// Create or update the jobs table
+	err = DB.AutoMigrate(&models.User{}, &models.Job{})
+	if err != nil {
+		log.Fatal("Failed to migrate database schema:", err)
+	}
 }
 
 // Yeni kullanıcı oluşturulduğunda çağrılacak fonksiyon
