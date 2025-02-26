@@ -12,7 +12,7 @@ import (
 
 var DB *gorm.DB
 
-func ConnectDB() {
+func ConnectDB() (*gorm.DB, error) {
 	var err error
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
@@ -24,7 +24,7 @@ func ConnectDB() {
 
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect to database")
+		return nil, err
 	}
 
 	// Create or update the jobs table
@@ -32,6 +32,8 @@ func ConnectDB() {
 	if err != nil {
 		log.Fatal("Failed to migrate database schema:", err)
 	}
+
+	return DB, nil
 }
 
 // Yeni kullanıcı oluşturulduğunda çağrılacak fonksiyon
