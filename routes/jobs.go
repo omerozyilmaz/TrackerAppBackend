@@ -8,7 +8,7 @@ import (
 )
 
 func SetupJobRoutes(router *gin.Engine) {
-	jobs := router.Group("/api/jobs")
+	jobs := router.Group("/jobs")
 	
 	// Use the centralized CORS middleware
 	jobs.Use(middleware.CORSMiddleware())
