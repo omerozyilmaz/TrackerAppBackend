@@ -3,7 +3,7 @@ FROM golang:1.23-alpine AS builder
 WORKDIR /app
 
 # Go proxy ayarı ekleyin
-ENV GOPROXY=https://proxy.golang.org,direct
+ENV GOPROXY=https://goproxy.io,direct
 
 # Copy go.mod and go.sum files
 COPY go.mod go.sum ./
