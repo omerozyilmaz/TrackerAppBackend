@@ -2,9 +2,12 @@ FROM golang:1.19-alpine AS builder
 
 WORKDIR /app
 
+# Go proxy ayarı ekleyin
+ENV GOPROXY=https://proxy.golang.org,direct
+
 # Copy go.mod and go.sum files
 COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod download -x  # -x bayrağı daha fazla hata ayıklama bilgisi sağlar
 
 # Copy the source code
 COPY . .
