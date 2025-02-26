@@ -4,18 +4,12 @@ import (
 	"job-tracker-api/config"
 	"job-tracker-api/middleware"
 	"job-tracker-api/routes"
-	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	// Initialize database
 	config.ConnectDB()
 
@@ -29,6 +23,12 @@ func main() {
 	routes.SetupJobRoutes(r)
 	routes.SetupAuthRoutes(r)
 
+	// Get port from environment variable or use default
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	// Start server
-	r.Run(":8080")
+	r.Run(":" + port)
 }
