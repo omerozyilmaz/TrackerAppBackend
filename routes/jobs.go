@@ -8,9 +8,8 @@ import (
 )
 
 func SetupJobRoutes(router *gin.Engine) {
+	// Support new URL structure (without /api prefix)
 	jobs := router.Group("/jobs")
-	
-	// Use the centralized CORS middleware
 	jobs.Use(middleware.CORSMiddleware())
 	jobs.Use(middleware.AuthMiddleware())
 	{
@@ -24,5 +23,22 @@ func SetupJobRoutes(router *gin.Engine) {
 		jobs.PATCH("/:id/status", controllers.UpdateJobStatus)
 		// Add new endpoint for moving jobs
 		jobs.PATCH("/:id/move", controllers.MoveJob)
+	}
+	
+	// Also support old URL structure (with /api prefix)
+	apiJobs := router.Group("/api/jobs")
+	apiJobs.Use(middleware.CORSMiddleware())
+	apiJobs.Use(middleware.AuthMiddleware())
+	{
+		apiJobs.GET("/", controllers.GetJobs)
+		apiJobs.POST("/", controllers.CreateJob)
+		apiJobs.GET("/:id", controllers.GetJob)
+		apiJobs.PUT("/:id", controllers.UpdateJob)
+		apiJobs.DELETE("/:id", controllers.DeleteJob)
+		
+		// Sadece status güncellemesi için özel endpoint (opsiyonel)
+		apiJobs.PATCH("/:id/status", controllers.UpdateJobStatus)
+		// Add new endpoint for moving jobs
+		apiJobs.PATCH("/:id/move", controllers.MoveJob)
 	}
 } 
