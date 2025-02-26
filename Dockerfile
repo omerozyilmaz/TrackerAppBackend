@@ -7,7 +7,7 @@ ENV GOPROXY=https://proxy.golang.org,direct
 
 # Copy go.mod and go.sum files
 COPY go.mod go.sum ./
-RUN go mod download -x  # -x bayrağı daha fazla hata ayıklama bilgisi sağlar
+RUN go mod download -x
 
 # Copy the source code
 COPY . .
