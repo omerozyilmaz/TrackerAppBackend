@@ -3,6 +3,7 @@ package controllers
 import (
 	"job-tracker-api/config"
 	"job-tracker-api/models"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -131,4 +132,27 @@ func UpdateExperience(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, experienceData)
+}
+
+func UpdateExistingProfiles() {
+	var profiles []models.Profile
+	if err := config.DB.Find(&profiles).Error; err != nil {
+		log.Println("Failed to fetch profiles:", err)
+		return
+	}
+
+	for _, profile := range profiles {
+		// Varsayılan değerleri kontrol et ve güncelle
+		if profile.Headline == "" {
+			profile.Headline = "Varsayılan Başlık"
+		}
+		if profile.Summary == "" {
+			profile.Summary = "Varsayılan Özet"
+		}
+		// Diğer alanlar için de benzer kontroller ekleyebilirsiniz
+
+		if err := config.DB.Save(&profile).Error; err != nil {
+			log.Println("Failed to update profile:", err)
+		}
+	}
 } 
