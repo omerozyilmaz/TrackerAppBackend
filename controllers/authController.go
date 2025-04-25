@@ -23,9 +23,13 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// Eğer kullanıcı LinkedIn ile kayıt oluyorsa, şifreyi boş bırakabilirsiniz
-	if user.Password == "" {
+	// Eğer kullanıcı LinkedIn ile kayıt oluyorsa ve şifre boşsa, varsayılan bir şifre oluştur
+	if user.LinkedInToken != "" && user.Password == "" {
 		user.Password = "default_password" // veya başka bir varsayılan değer
+	} else if user.Password == "" {
+		// Manuel kayıt için şifre zorunlu
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password is required for manual registration"})
+		return
 	}
 
 	// Hash password
@@ -39,6 +43,12 @@ func Register(c *gin.Context) {
 	// Create user
 	if err := config.DB.Create(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		return
+	}
+
+	// Kullanıcı başarıyla oluşturulduktan sonra
+	if err := config.CreateUserTables(user.ID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user tables"})
 		return
 	}
 
