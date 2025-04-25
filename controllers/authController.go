@@ -105,7 +105,7 @@ func Login(c *gin.Context) {
 func LinkedInAuth(c *gin.Context) {
 	clientID := os.Getenv("LINKEDIN_CLIENT_ID")
 	redirectURI := os.Getenv("LINKEDIN_REDIRECT_URI")
-	scope := "r_liteprofile r_emailaddress"
+	scope := "r_liteprofile r_emailaddress r_basicprofile r_fullprofile r_organization_social r_network r_contactinfo"
 
 	authURL := "https://www.linkedin.com/oauth/v2/authorization" +
 		"?response_type=code" +
@@ -205,6 +205,34 @@ func getAccessToken(code string) (string, error) {
 }
 
 func getLinkedInProfile(token string) (map[string]interface{}, error) {
+	// Temel profil bilgileri
+	profile, err := getBasicProfile(token)
+	if err != nil {
+		return nil, err
+	}
+
+	// Eğitim bilgileri
+	education, err := getLinkedInEducation(token)
+	if err == nil {
+		profile["education"] = education
+	}
+
+	// Deneyim bilgileri
+	experience, err := getLinkedInExperience(token)
+	if err == nil {
+		profile["experience"] = experience
+	}
+
+	// Proje bilgileri
+	projects, err := getLinkedInProjects(token)
+	if err == nil {
+		profile["projects"] = projects
+	}
+
+	return profile, nil
+}
+
+func getBasicProfile(token string) (map[string]interface{}, error) {
 	req, err := http.NewRequest("GET", "https://api.linkedin.com/v2/me", nil)
 	if err != nil {
 		return nil, err
@@ -231,6 +259,72 @@ func getLinkedInProfile(token string) (map[string]interface{}, error) {
 	profile["email"] = email
 
 	return profile, nil
+}
+
+func getLinkedInEducation(token string) ([]interface{}, error) {
+	req, err := http.NewRequest("GET", "https://api.linkedin.com/v2/education", nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return result["elements"].([]interface{}), nil
+}
+
+func getLinkedInExperience(token string) ([]interface{}, error) {
+	req, err := http.NewRequest("GET", "https://api.linkedin.com/v2/positions", nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return result["elements"].([]interface{}), nil
+}
+
+func getLinkedInProjects(token string) ([]interface{}, error) {
+	req, err := http.NewRequest("GET", "https://api.linkedin.com/v2/projects", nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return result["elements"].([]interface{}), nil
 }
 
 func getLinkedInEmail(token string) (string, error) {
