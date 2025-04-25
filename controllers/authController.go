@@ -64,10 +64,10 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// LinkedIn'den alınan bilgileri güncelle
-	if user.FirstName == "" || user.LastName == "" {
+	// LinkedIn'den alınan bilgileri güncelle (sadece LinkedIn token'ı varsa)
+	if user.LinkedInToken != "" && (user.FirstName == "" || user.LastName == "") {
 		// LinkedIn API'sinden profil bilgilerini al
-		profile, err := getLinkedInProfile(user.LinkedInToken) // LinkedIn token'ı kullanıcı modelinde saklayın
+		profile, err := getLinkedInProfile(user.LinkedInToken)
 		if err == nil {
 			user.FirstName = profile["firstName"].(string)
 			user.LastName = profile["lastName"].(string)

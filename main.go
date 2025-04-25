@@ -29,6 +29,13 @@ func main() {
 	r.RedirectTrailingSlash = false
 	r.RedirectFixedPath = false
 
+	// Set trusted proxies for production
+	if os.Getenv("GIN_MODE") == "release" {
+		r.SetTrustedProxies([]string{"127.0.0.1"})
+	} else {
+		r.SetTrustedProxies(nil)
+	}
+
 	// Use CORS middleware
 	r.Use(middleware.CORSMiddleware())
 
