@@ -18,12 +18,12 @@ func ConnectDB() {
 	// Railway'de DATABASE_URL ortam değişkeni otomatik olarak sağlanır
 	dbURL := os.Getenv("DATABASE_URL")
 	
-	// Eğer DATABASE_URL varsa, doğrudan onu kullan
 	if dbURL != "" {
+		log.Println("Connecting to database using URL...")
 		DB, err = gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 	} else {
-		// Yoksa, ayrı ayrı değişkenleri kullan (yerel geliştirme için)
-		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		log.Println("Connecting to database using individual credentials...")
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require",
 			os.Getenv("DB_HOST"),
 			os.Getenv("DB_USER"),
 			os.Getenv("DB_PASSWORD"),
@@ -37,14 +37,36 @@ func ConnectDB() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	// Create or update the jobs table
+	// Bağlantıyı test et
+	sqlDB, err := DB.DB()
+	if err != nil {
+		log.Fatal("Failed to get database instance:", err)
+	}
+
+	err = sqlDB.Ping()
+	if err != nil {
+		log.Fatal("Failed to ping database:", err)
+	}
+
+	log.Println("Successfully connected to database")
+
+	// Veritabanını migrate et
+	log.Println("Starting database migration...")
 	err = DB.AutoMigrate(&models.User{}, &models.Job{})
 	if err != nil {
 		log.Fatal("Failed to migrate database schema:", err)
 	}
+	log.Println("Database migration completed successfully")
 }
 
 // Yeni kullanıcı oluşturulduğunda çağrılacak fonksiyon
 func CreateUserTables(userID uint) error {
-	return models.CreateJobTableForUser(DB, userID)
+	log.Printf("Creating tables for user ID: %d\n", userID)
+	err := models.CreateJobTableForUser(DB, userID)
+	if err != nil {
+		log.Printf("Error creating user tables: %v\n", err)
+		return err
+	}
+	log.Println("User tables created successfully")
+	return nil
 } 
