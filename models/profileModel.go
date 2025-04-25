@@ -17,6 +17,7 @@ type Profile struct {
 	Education     []Education    `json:"education"`
 	Experience    []Experience   `json:"experience"`
 	Projects      []Project      `json:"projects"`
+	ProfilePicture string         `json:"profile_picture"`
 	CreatedAt     time.Time      `json:"created_at"`
 	UpdatedAt     time.Time      `json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `json:"-" gorm:"index"`

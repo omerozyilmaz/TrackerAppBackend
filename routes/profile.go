@@ -18,6 +18,9 @@ func SetupProfileRoutes(router *gin.Engine) {
 		profile.POST("/", controllers.UpdateProfile)
 		profile.PUT("", controllers.UpdateProfile)
 		profile.PUT("/", controllers.UpdateProfile)
+		profile.PUT("/picture", controllers.UpdateProfilePicture)
+		profile.PUT("/education", controllers.UpdateEducation)
+		profile.PUT("/experience", controllers.UpdateExperience)
 	}
 
 	// Also support old URL structure (with /api prefix)
@@ -30,5 +33,8 @@ func SetupProfileRoutes(router *gin.Engine) {
 		apiProfile.POST("/", controllers.UpdateProfile)
 		apiProfile.PUT("", controllers.UpdateProfile)
 		apiProfile.PUT("/", controllers.UpdateProfile)
+		apiProfile.PUT("/picture", controllers.UpdateProfilePicture)
+		apiProfile.PUT("/education", controllers.UpdateEducation)
+		apiProfile.PUT("/experience", controllers.UpdateExperience)
 	}
 } 

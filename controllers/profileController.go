@@ -57,4 +57,78 @@ func UpdateProfile(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, profile)
+}
+
+func UpdateProfilePicture(c *gin.Context) {
+	userID := c.GetUint("user_id")
+
+	// FormData'dan dosyayı al
+	file, err := c.FormFile("profilePicture")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No file is received"})
+		return
+	}
+
+	// Dosyayı kaydetme işlemi (örneğin, belirli bir dizine)
+	if err := c.SaveUploadedFile(file, "./uploads/"+file.Filename); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+		return
+	}
+
+	// Kullanıcı profilini güncelle (örneğin, veritabanında profil resmini güncelle)
+	var profile models.Profile
+	if err := config.DB.Where("user_id = ?", userID).First(&profile).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Profile not found"})
+		return
+	}
+
+	profile.ProfilePicture = file.Filename // veya dosya yolunu güncelleyin
+	if err := config.DB.Save(&profile).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update profile picture"})
+		return
+	}
+
+	c.JSON(http.StatusOK, profile)
+}
+
+func UpdateEducation(c *gin.Context) {
+	userID := c.GetUint("user_id")
+
+	var educationData []models.Education
+	if err := c.ShouldBindJSON(&educationData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Eğitim bilgilerini güncelle
+	for _, edu := range educationData {
+		edu.ProfileID = userID // Kullanıcı ID'sini ayarla
+		if err := config.DB.Save(&edu).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update education"})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, educationData)
+}
+
+func UpdateExperience(c *gin.Context) {
+	userID := c.GetUint("user_id")
+
+	var experienceData []models.Experience
+	if err := c.ShouldBindJSON(&experienceData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Deneyim bilgilerini güncelle
+	for _, exp := range experienceData {
+		exp.ProfileID = userID // Kullanıcı ID'sini ayarla
+		if err := config.DB.Save(&exp).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update experience"})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, experienceData)
 } 
