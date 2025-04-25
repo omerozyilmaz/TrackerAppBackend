@@ -36,29 +36,6 @@ func main() {
 	routes.SetupJobRoutes(r)
 	routes.SetupAuthRoutes(r)
 
-	r.GET("/api/linkedin/auth", func(c *gin.Context) {
-		authURL := "https://www.linkedin.com/oauth/v2/authorization?response_type=code" +
-			"&client_id=" + clientID +
-			"&redirect_uri=" + redirectURI +
-			"&scope=r_liteprofile%20r_emailaddress"
-		c.Redirect(http.StatusFound, authURL)
-	})
-
-	r.GET("/api/linkedin/callback", func(c *gin.Context) {
-		code := c.Query("code")
-		accessToken, err := getAccessToken(code)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get access token"})
-			return
-		}
-		profile, err := getLinkedInProfile(accessToken)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get profile"})
-			return
-		}
-		c.JSON(http.StatusOK, profile)
-	})
-
 	// Get port from environment variable or use default
 	port := os.Getenv("PORT")
 	if port == "" {
