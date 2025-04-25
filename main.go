@@ -42,6 +42,7 @@ func main() {
 	// Setup routes
 	routes.SetupJobRoutes(r)
 	routes.SetupAuthRoutes(r)
+	routes.SetupProfileRoutes(r)
 
 	// Get port from environment variable or use default
 	port := os.Getenv("PORT")
