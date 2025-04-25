@@ -12,6 +12,8 @@ func SetupAuthRoutes(router *gin.Engine) {
 	{
 		auth.POST("/register", controllers.Register)
 		auth.POST("/login", controllers.Login)
+		auth.GET("/linkedin/auth", controllers.LinkedInAuth)
+		auth.GET("/linkedin/callback", controllers.LinkedInCallback)
 	}
 	
 	// Also support old URL structure (with /api prefix)
@@ -19,5 +21,7 @@ func SetupAuthRoutes(router *gin.Engine) {
 	{
 		apiAuth.POST("/register", controllers.Register)
 		apiAuth.POST("/login", controllers.Login)
+		apiAuth.GET("/linkedin/auth", controllers.LinkedInAuth)
+		apiAuth.GET("/linkedin/callback", controllers.LinkedInCallback)
 	}
 } 

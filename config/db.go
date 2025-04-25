@@ -37,8 +37,17 @@ func ConnectDB() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	// Create or update the jobs table
-	err = DB.AutoMigrate(&models.User{}, &models.Job{})
+	// Create or update the tables
+	err = DB.AutoMigrate(
+		&models.User{},
+		&models.Job{},
+		&models.Profile{},
+		&models.Skill{},
+		&models.Education{},
+		&models.Experience{},
+		&models.Project{},
+		&models.LinkedInAuth{},
+	)
 	if err != nil {
 		log.Fatal("Failed to migrate database schema:", err)
 	}
@@ -46,5 +55,18 @@ func ConnectDB() {
 
 // Yeni kullanıcı oluşturulduğunda çağrılacak fonksiyon
 func CreateUserTables(userID uint) error {
-	return models.CreateJobTableForUser(DB, userID)
+	// Create job table for user
+	if err := models.CreateJobTableForUser(DB, userID); err != nil {
+		return err
+	}
+
+	// Create profile for user
+	profile := models.Profile{
+		UserID: userID,
+	}
+	if err := DB.Create(&profile).Error; err != nil {
+		return err
+	}
+
+	return nil
 } 
